@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Couplers</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- buat navigasi menu list -->
+    <nav>
+        <div class="home">
+            <a href="#home">The Couplers</a>
+        </div>
+
+        <ul>
+            <li><a href="#FE">Feature Envy</a></li>
+            <li><a href="#II">Inappropriate Intimacy</a></li>
+            <li><a href="#MC">Message Chains</a></li>
+            <li><a href="#MM">Middle Man</a></li>
+        </ul>
+    </nav>
+
+
+    <div class="content">
+
+        <h1>The Couplers</h1>
+        <p>by Wisnu Dharmasatria Tantra</p>
+        <p>Semua smell di dalam grup ini berkaitan dengan coupling yang tinggi. Meski tidak mempengaruhi jalannya project, namun tingginya coupling (dan rendahnya cohesion) akan menyusahkan class lain dan secara tidak langsung mengakibatkan developer sulit menangani perubahan modul meski dengan perubahan paling kecil sekalipun karena dependensi antar class yang tinggi. Seperti yang telah Anda pelajari di matakuliah Program Design Methods di semester sebelumnya, code yang baik memiliki coupling yang dibuat serendah mungkin antar modulnya, dan memiliki cohesion yang dibuat setinggi mungkin di dalam modulnya.</p>
+
+
+        <div id="FE">
+            <div class="garis">
+                <hr>
+            </div>
+            <h2>Feature Envy</h2>
+            <p>
+                Smell ini terjadi bila ada sebuah method yang lebih sering mengakses data class lain ketimbang class sendiri. Class sendiri pun menjadi ‘cemburu’. Bila hal ini terjadi, harus dipikirkan bagaimana cara mengusir method ini ke class lain tersebut. Pada contoh Lecturer.java, terdapat method isScored yang hanya mengakses data examiner di class Exam.
+            </p>
+            <h3>Contoh</h3>
+            <div class="kotak">
+                <pre>
+                    <code>
+
+                        public boolean isScored(Exam exam) {
+                            return exam.getExaminer() != null;
+                          }
+
+                    </code>
+                </pre>
+            </div>
+
+            <h3>Solusi</h3>
+            <div class="kotak">
+                <pre>
+                    <code>
+
+                        if(this.isScored()) {
+                            throw new IllegalArgumentException("exam already scored");
+                          }
+
+                    </code>
+                </pre>
+            </div>
+            
+
+        </div>
+
+
+
+        <!-- nomor 2-->
+
+        <div id="II">
+
+            <div class="garis">
+                <hr>
+            </div>
+
+            <h2>Inappropriate Intimacy</h2>
+            <p>
+                Smell ini terjadi karena hubungan antar class yang terlalu intim, menyebabkan class yang satu mengeksploitasi internal field dan/atau method di class lain. Hal ini berbahaya karena class yang internal logic-nya diakses bisa mendapat perlakuan yang tidak terduga. 
+            </p>
+            <h3>Contoh</h3>
+            <div class="kotak">
+                <pre>
+                    <code>
+
+                        namespace FeatureEnvySmell
+{
+    class ContactInfo
+    {
+        public string GetStreetName()
+        {
+            return "1 Medison Square";
+        }
+        public string GetCity()
+        {
+            return "NewYork";
+        }
+        public string GetState()
+        {
+            return "NY";
+        }
+    }
+    class User
+    {
+        private ContactInfo _contactInfo;
+        User(ContactInfo contactInfo)
+        {
+            _contactInfo = contactInfo;
+        }
+        public string GetFullAddress(ContactInfo info)
+        {
+            string city = info.GetCity();//1
+            string state = info.GetState();//2
+            string streetName = info.GetStreetName();//3
+            return streetName + ";" + city + ";" + state;
+        }
+    }
+}
+
+                    </code>
+                </pre>
+            </div>
+
+            <h3>Solusi</h3>
+            <div class="kotak">
+                <pre>
+                    <code>
+
+                        namespace FeatureEnvySmellResolved
+{
+    class ContactInfo
+    {
+        public string GetStreetName()
+        {
+            return "1 Medison Square";
+        }
+        public string GetCity()
+        {
+            return "NewYork";
+        }
+        public string GetState()
+        {
+            return "NY";
+        }
+        public string GetFullAddress(ContactInfo info)
+        {
+            string city = info.GetCity();//1
+            string state = info.GetState();//2
+            string streetName = info.GetStreetName();//3
+            return streetName + ";" + city + ";" + state;
+        }
+    }
+    class User
+    {
+        private ContactInfo _contactInfo;
+        User(ContactInfo contactInfo)
+        {
+            _contactInfo = contactInfo;
+        }
+    }
+}
+
+                    </code>
+                </pre>
+            </div>
+
+
+
+
+
+        </div>
+
+
+
+        <!-- nomor 3 -->
+
+
+
+
+        <div id="MC">
+            <div class="garis">
+                <hr>
+            </div>
+            <h2>Message Chains</h2>
+            <p>
+                Smell ini terjadi ketika ingin mengakses sebuah method, perlu dilakukan pemanggilan dari hasil return method lainnya sehingga membentuk rantai: obj.a().b().c().
+                        </p>
+            <h3>Contoh</h3>
+            <div class="kotak">
+                <pre>
+                    <code>
+
+                        ...
+                        driver.getCurrentPosition().getLatitude();
+                        ...
+
+                    </code>
+                </pre>
+            </div>
+
+            <h3>Solusi</h3>
+            <div class="kotak">
+                <pre>
+                    <code>
+
+                        public double latitude() {
+                            return this.getCurrentPosition().getLatitude();
+                          }
+                          
+                          public double longitude() {
+                            return this.getCurrentPosition().getLongitude();
+                          }
+
+                    </code>
+                </pre>
+            </div>
+            
+
+        </div>
+
+
+    <!-- nomor 4 -->
+
+
+    <div id="MM">
+        <div class="garis">
+            <hr>
+        </div>
+        <h2>Middle Man</h2>
+        <p>
+            Middle Man adalah class yang isinya hanya delegasi saja, tidak ada behavior lain selain delegasi ke class lain.
+                            </p>
+        <h3>Contoh</h3>
+        <div class="kotak">
+            <pre>
+                <code>
+
+                    class Program
+ {
+    static void Main(string[] args)
+     {
+         Person person = new Person();
+         person = person.GetManager();
+     }
+ }
+ 
+ 
+ class Person
+ {
+     public Department Department { get; set; }
+     public Person GetManager()
+     {
+         return Department.GetManager();
+     }
+ }
+ 
+ 
+ class Department
+ {
+     private readonly Person _manager;
+     public Department(Person manager)
+     {
+         _manager = manager;
+     }
+     public Person GetManager()
+     {
+         return _manager;
+     }
+ }
+
+                </code>
+            </pre>
+        </div>
+
+        <h3>Solusi</h3>
+        <div class="kotak">
+            <pre>
+                <code>
+
+                    class Program
+    {
+        static void Main(string[] args)
+        {
+            Person person = new Person();
+            Department department = person.GetDepartment();
+            person = department.GetManager();
+        }
+    }
+    class Person
+    {
+        public Department Department;
+        public Department GetDepartment()
+        {
+            return Department;
+        }
+ 
+    }
+ 
+    class Department
+    {
+        private readonly Person _manager;
+        public Department(Person manager)
+        {
+            _manager = manager;
+        }
+        public Person GetManager()
+        {
+            return _manager;
+        }
+ 
+    }
+
+                </code>
+            </pre>
+        </div>
+        
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+
+
+    
+</body>
+</html>
